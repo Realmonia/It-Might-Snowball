@@ -1,0 +1,40 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class CameraPositionFix : MonoBehaviour {
+	LayerMask terrain_layer = 1<<11;
+<<<<<<< HEAD
+	Vector3 originalPos;
+	public bool shake;
+
+=======
+>>>>>>> 1b84c3f4bb5020e1d1fe5da91ff417999af558e0
+	// Use this for initialization
+	void Start () {
+		
+	}
+<<<<<<< HEAD
+=======
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+>>>>>>> 1b84c3f4bb5020e1d1fe5da91ff417999af558e0
+
+	void FixedUpdate(){
+		if (Physics.Raycast(transform.position, transform.parent.position, 0.1f, terrain_layer)){
+			Debug.Log ("true");
+		}
+	}
+
+	IEnumerator CameraMoveFoward(){
+		float end_y = this.transform.localPosition.y * (-6f / this.transform.localPosition.z);
+		Vector3 endpoint = new Vector3(this.transform.localPosition.x, end_y, this.transform.localPosition.z+0.5f);
+		for (float t = 0; t < 0.2f; t += Time.deltaTime){
+			this.transform.localPosition = Vector3.Lerp (this.transform.localPosition, endpoint, 0.5f);
+			yield return null;
+		}
+	}
+}

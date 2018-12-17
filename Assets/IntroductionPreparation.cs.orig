@@ -1,0 +1,90 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class IntroductionPreparation : MonoBehaviour {
+	
+	GameObject gold_snowman;
+	GameObject gold_player;
+	GameObject purple_snowman;
+	GameObject purple_player;
+	Animator anim;
+	public BothReadyMonitor monitorScript;
+<<<<<<< HEAD
+	GameControl gamecontrol;
+	bool isPlaying = true;
+=======
+>>>>>>> 1b84c3f4bb5020e1d1fe5da91ff417999af558e0
+
+	bool gold_introduced = false;
+	bool purple_introduced = false;
+	// Use this for initialization
+	void Start () {
+		gold_snowman = GameObject.Find ("Snowman_Gold");
+		gold_player = GameObject.Find ("Player_Gold");
+		purple_player = GameObject.Find ("Player_Purple");
+		purple_snowman = GameObject.Find ("snowman_purple");
+		anim = GetComponent<Animator> ();
+		gold_snowman.GetComponent<Movement>().enabled = false;
+		gold_player.GetComponent<Movement>().enabled = false;
+		purple_snowman.GetComponent<Movement>().enabled = false;
+		purple_player.GetComponent<Movement>().enabled = false;
+		gold_snowman.transform.position = GameObject.Find ("gold_snowman_marker").transform.position;
+		gold_snowman.transform.rotation = GameObject.Find ("gold_snowman_marker").transform.rotation;
+		gold_player.transform.position = GameObject.Find ("gold_player_marker").transform.position;
+		gold_player.transform.rotation = GameObject.Find ("gold_player_marker").transform.rotation;
+		purple_snowman.transform.position = GameObject.Find ("purple_snowman_marker").transform.position;
+		purple_snowman.transform.rotation = GameObject.Find ("purple_snowman_marker").transform.rotation;
+		purple_player.transform.position = GameObject.Find ("purple_player_marker").transform.position;
+		purple_player.transform.rotation = GameObject.Find ("purple_player_marker").transform.rotation;
+	}
+	
+	// Update is called once per frame
+	void Update () {
+
+		if (!gold_introduced && Vector3.Angle(transform.forward, gold_player.transform.position - transform.position) < 20f && Vector3.Distance(transform.position, gold_player.transform.position) < 5f){
+			intro_animation ("gold");
+		}
+		if (!purple_introduced && Vector3.Angle(transform.forward, purple_player.transform.position - transform.position) < 20f && Mathf.Abs(Vector3.Distance(transform.position, purple_player.transform.position)) < 6f){
+			intro_animation ("purple");
+		}
+		if (!AnimatorIsPlaying()){
+			stopPoseAnimation ();
+			gold_snowman.GetComponent<Movement>().enabled = true;
+			gold_player.GetComponent<Movement>().enabled = true;
+			purple_snowman.GetComponent<Movement>().enabled = true;
+			purple_player.GetComponent<Movement>().enabled = true;
+			monitorScript.inIntroduction = false;
+			this.gameObject.SetActive (false);
+		}
+	}
+
+	// https://answers.unity.com/questions/362629/how-can-i-check-if-an-animation-is-being-played-or.html
+	bool AnimatorIsPlaying(){
+		return anim.GetCurrentAnimatorStateInfo(0).length >
+			anim.GetCurrentAnimatorStateInfo(0).normalizedTime;
+	}
+
+	void intro_animation(string team){
+		if (team == "gold"){
+			gold_introduced = true;
+			gold_player.GetComponent<Animator> ().SetInteger ("rand_pose", Random.Range (1, 4));
+			gold_snowman.GetComponent<Animator> ().SetInteger ("rand_pose", Random.Range (1, 5));
+
+		}else{
+			purple_introduced = true;
+			purple_player.GetComponent<Animator> ().SetInteger ("rand_pose", Random.Range (1, 4));
+			purple_snowman.GetComponent<Animator> ().SetInteger ("rand_pose", Random.Range (1, 5));
+
+
+		}
+	}
+
+	void stopPoseAnimation(){
+		gold_player.GetComponent<Animator> ().SetInteger ("rand_pose", 0);
+		purple_player.GetComponent<Animator> ().SetInteger ("rand_pose", 0);
+		gold_snowman.GetComponent<Animator> ().SetInteger ("rand_pose", 0);
+		purple_snowman.GetComponent<Animator> ().SetInteger ("rand_pose", 0);
+
+	}
+}

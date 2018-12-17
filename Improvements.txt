@@ -1,0 +1,5 @@
+- Control Improvement: Everyone press Y can restart
+- UX Improvement: Improved tutorial instructions / Team distinction yellow & purple outline / Improved UI visibility / Refined UI text
+- Death slow motion camera
+- Fix bug which enables player under certain circumstance to collect ammo at any time
+- Fix bug which leads to cannon build text doesn't show up normally

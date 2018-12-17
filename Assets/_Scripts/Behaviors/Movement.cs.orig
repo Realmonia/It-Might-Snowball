@@ -1,0 +1,164 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using InControl;
+
+public class Movement : MonoBehaviour {
+
+	public float movement_speed;
+	public int player_num;
+	public float slowdown_modifier = .5f;
+	InputDevice inputDevice;
+	Rigidbody rb;
+	GameObject player_camera;
+	SnowmanAnimationControl animControl;
+	AbilityCooldown cooldownUI;
+    private float rotationSpeed = 1f;
+    public float minRotationSpeed = .5f;
+<<<<<<< HEAD
+
+	public float dashForce;
+	public float dashCoolDown;
+	public float knockbackForce = 10000f;
+=======
+	public float jumpinterval;
+	public float amplitudeY;
+	public float dashForce;
+	public float dashCoolDown;
+
+>>>>>>> 1b84c3f4bb5020e1d1fe5da91ff417999af558e0
+	private bool snowman;
+	private bool isDashing = false;
+	private bool canDash = true;
+	private float time;
+	private float starting_speed;
+
+	// Use this for initialization
+	void Start () {
+		rb = GetComponentInChildren<Rigidbody> ();
+		player_camera = GetComponentInChildren<Camera> ().gameObject; 
+		starting_speed = movement_speed;
+		animControl = GetComponent<SnowmanAnimationControl> ();
+        snowman = GetComponent<PlayerType>().isSnowMan;
+		cooldownUI = GetComponentInChildren<AbilityCooldown> ();
+    }
+
+    // Update is called once per frame
+    void Update () {
+		inputDevice = (InputManager.Devices.Count > player_num) ? InputManager.Devices[player_num] : null;
+		if (inputDevice != null) {
+
+			if (snowman && inputDevice.Action3.IsPressed && canDash) {
+				StartCoroutine (Dash ());
+			}
+		}
+
+	}
+
+	public InputDevice getInputDevice() {
+		return inputDevice;
+	}
+
+	void FixedUpdate(){
+		if (inputDevice != null){
+			// Movement
+			Vector3 forward_movement = transform.forward * inputDevice.Direction.Y;
+			Vector3 horizontal_movement = transform.right * inputDevice.Direction.X;
+			Vector3 falling_velocity = new Vector3(0, rb.velocity.y, 0);
+			if (snowman){
+				if (forward_movement.magnitude > 0 || horizontal_movement.magnitude > 0) {
+					time += Time.deltaTime;
+					if (time > jumpinterval) {
+						time = 0;
+						falling_velocity.y += amplitudeY;
+					}
+				}
+			}
+
+			if (isDashing){
+				
+				rb.AddForce ((forward_movement + horizontal_movement) * dashForce*1.8f);
+			}else{
+				rb.velocity = (movement_speed * (forward_movement + horizontal_movement) + falling_velocity);
+			}
+			// Horizontal Rotation
+			float rotation_Y = inputDevice.RightStick.X;
+			transform.Rotate (Vector3.up, rotation_Y*2*rotationSpeed);
+
+			// Lookup and Lookdown
+			float rotation_x = inputDevice.RightStick.Y;
+			if (player_camera.transform.localRotation.x > 0.15f && rotation_x <0) {
+				rotation_x = 0;
+			}
+			if (player_camera.transform.localRotation.x < -0.1f && rotation_x >0) {
+				rotation_x = 0;
+			}
+			player_camera.transform.RotateAround (this.transform.position, this.transform.right, -rotation_x*rotationSpeed);
+
+		}
+	}
+
+	//modifies movement speed
+	public void slowDown() {
+		movement_speed = starting_speed * slowdown_modifier;
+	}
+
+	//modifies movement speed
+	public void speedUp() {
+		movement_speed = starting_speed;
+	}
+
+    public void rotationSlowDown() {
+        rotationSpeed = minRotationSpeed;
+    }
+
+    public void rotationSpeedUp() {
+        rotationSpeed = 1f;
+    }
+
+	IEnumerator Dash(){
+		StartCoroutine(dashCameraStart ());
+		canDash = false;
+		isDashing = true;
+		animControl.beginDashing ();
+		cooldownUI.using_dash (1.5f);
+		yield return new WaitForSeconds (1.5f);
+		isDashing = false;
+		animControl.endDashing ();
+
+		StartCoroutine(dashCameraEnd ());
+
+		cooldownUI.dash_cooldown (dashCoolDown);
+		yield return new WaitForSeconds (dashCoolDown);
+		canDash = true;
+	}
+
+	IEnumerator dashCameraStart(){
+		Debug.Log ("here");
+		float end_y = player_camera.transform.localPosition.y * (-6.5f / player_camera.transform.localPosition.z);
+		Vector3 endpoint = new Vector3(player_camera.transform.localPosition.x, end_y, -6.5f);
+		for (float t = 0; t < 0.5f; t += Time.deltaTime){
+			player_camera.transform.localPosition = Vector3.Lerp (player_camera.transform.localPosition, endpoint, 0.2f);
+			yield return null;
+		}
+
+	}
+
+	IEnumerator dashCameraEnd(){
+		float end_y = player_camera.transform.localPosition.y * (-4f / player_camera.transform.localPosition.z);
+		Vector3 endpoint = new Vector3(player_camera.transform.localPosition.x, end_y, -4f);
+		for (float t = 0; t < 0.5f; t += Time.deltaTime){
+			player_camera.transform.localPosition = Vector3.Lerp (player_camera.transform.localPosition, endpoint, 0.2f);
+			yield return null;
+		}
+
+	}
+<<<<<<< HEAD
+	public void pushback(){
+		rb.velocity = Vector3.zero;
+		rb.AddForce (-transform.forward *knockbackForce);
+	}
+
+=======
+>>>>>>> 1b84c3f4bb5020e1d1fe5da91ff417999af558e0
+}

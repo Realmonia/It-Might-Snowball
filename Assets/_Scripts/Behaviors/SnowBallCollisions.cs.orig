@@ -1,0 +1,108 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+
+public class SnowBallCollisions : MonoBehaviour {
+	public int player_num = -1;
+	public float destructionTime = 1f;
+	public Shooting owner;
+
+	//stops from hitting two things
+	private int snowballHeath = 1;
+
+	// Use this for initialization
+	void Start () {
+		GetComponent<ParticleSystem> ().Stop();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+	void OnTriggerEnter(Collider otherCollider) {
+        collisionCode(otherCollider);
+	}
+
+    void OnTriggerStay(Collider otherCollider) {
+        collisionCode(otherCollider);
+    }
+
+    void collisionCode(Collider otherCollider) {
+        if (otherCollider.gameObject.layer == 9) {
+
+            //tries to grab movement from player
+            GameObject other = otherCollider.gameObject;
+            other = getParent(otherCollider.gameObject);
+
+            Movement movement = other.GetComponent<Movement>();
+
+            //stops player from hitting themselves and their teammates
+            if (movement != null && movement.player_num != player_num &&
+				movement.player_num != player_num + 1) {
+                //makes sure snowball can only hit one player
+                snowballHeath -= 1;
+
+                if (snowballHeath > -1) {
+
+                    //Remove Health?
+                    other.GetComponent<Health>().removeHealth(1);
+<<<<<<< HEAD
+					other.GetComponentInChildren<CameraPositionFix> ().CameraShake ();
+					if (other.GetComponent<PlayerType>().isSnowMan){
+						other.GetComponent<Movement> ().pushback ();
+					}
+
+=======
+>>>>>>> 1b84c3f4bb5020e1d1fe5da91ff417999af558e0
+                    owner.HitConfirmation();
+                    StartCoroutine("snowBallDestruction");
+                }
+            }
+            if (movement != null && movement.player_num != player_num &&
+                movement.player_num == player_num + 1) {
+                StartCoroutine("snowBallDestruction");
+            }
+        }
+        if (otherCollider.gameObject.layer == 0 || otherCollider.gameObject.layer == 11) {
+            StartCoroutine("snowBallDestruction");
+        }
+        if (otherCollider.gameObject.layer == 12) {
+            otherCollider.gameObject.GetComponent<OnHitRotate>().SnowballHitRotate();
+            StartCoroutine("snowBallDestruction");
+        }
+
+    }
+
+	public void setPlayerNum(int playerIn) {
+		player_num = playerIn;
+	}
+
+	public GameObject getParent(GameObject child) {
+		Transform childTransform = child.transform;
+		if (childTransform.parent == null) {
+			return child;
+		}
+		return getParent (childTransform.parent.gameObject);
+	}
+
+	IEnumerator snowBallDestruction() {
+		float time = 0f;
+
+		//stops motion and turns on particles
+		GetComponent<Rigidbody>().useGravity = false;
+		GetComponent<Rigidbody> ().velocity = Vector3.zero;
+		GetComponent<ParticleSystem> ().Play();
+		GetComponent<MeshRenderer> ().enabled = false;
+
+		//after destructionTime seconds, destroys object
+		while (time < destructionTime) {
+			time += Time.deltaTime;
+			yield return null;
+		}
+
+
+		Destroy (this.gameObject);
+	}
+}

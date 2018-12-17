@@ -1,0 +1,2 @@
+Multiplayer snowball fighting game.
+Implemented: gathering snow from snow piles, throwing snow, UI, and movement.
